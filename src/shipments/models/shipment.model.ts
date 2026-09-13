@@ -1,13 +1,15 @@
 import { ShipmentStatus } from '../enums/shipment-status.enum';
 
 export class Shipment {
-  id: string;
-  orderNumber: string;
-  recipientName: string;
-  address: string;
-  commune: string;
-  email: string;
-  status: ShipmentStatus;
-  createdAt: string;
-  updatedAt: string;
+  constructor(
+    public id: string,
+    public orderNumber: string,
+    public recipientName: string,
+    public address: string,
+    public commune: string,
+    public email: string,
+    public status: ShipmentStatus,
+    public createdAt: string,
+    public updatedAt: string,
+  ) {}
 }
