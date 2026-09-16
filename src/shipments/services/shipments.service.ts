@@ -4,6 +4,12 @@ import { CreateShipmentDto } from '../dto/create-shipment.dto';
 import { ShipmentStatus } from '../enums/shipment-status.enum';
 import { Shipment } from '../models/shipment.model';
 
+const ALLOWED_STATUS_TRANSITIONS: Partial<Record<ShipmentStatus, ShipmentStatus>> = {
+  [ShipmentStatus.PENDING]: ShipmentStatus.PREPARING,
+  [ShipmentStatus.PREPARING]: ShipmentStatus.SHIPPED,
+  [ShipmentStatus.SHIPPED]: ShipmentStatus.DELIVERED,
+};
+
 @Injectable()
 export class ShipmentsService {
   private readonly shipments: Shipment[] = [];
@@ -52,6 +58,24 @@ export class ShipmentsService {
     if (!shipment) {
       throw new NotFoundException(`Shipment with id ${id} not found`);
     }
+
+    return shipment;
+  }
+
+  updateStatus(id: string, newStatus: ShipmentStatus): Shipment {
+    const shipment = this.findOne(id);
+
+    const currentStatus = shipment.status;
+    const nextAllowedStatus = ALLOWED_STATUS_TRANSITIONS[currentStatus];
+
+    if (nextAllowedStatus !== newStatus) {
+      throw new ConflictException(
+        `Invalid status transition from ${currentStatus} to ${newStatus}`,
+      );
+    }
+
+    shipment.status = newStatus;
+    shipment.updatedAt = new Date().toISOString();
 
     return shipment;
   }

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { CreateShipmentDto } from '../dto/create-shipment.dto';
 import { QueryShipmentsDto } from '../dto/query-shipments.dto';
 import { ShipmentDetailResponseDto } from '../dto/shipment-detail-response.dto';
 import { ShipmentListResponseDto } from '../dto/shipment-list-response.dto';
+import { UpdateShipmentStatusDto } from '../dto/update-shipment-status.dto';
 import { Shipment } from '../models/shipment.model';
 import { ShipmentsService } from '../services/shipments.service';
 
@@ -37,6 +39,18 @@ export class ShipmentsController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): ShipmentDetailResponseDto {
     const shipment = this.shipmentsService.findOne(id);
+    return this.toDetailResponse(shipment);
+  }
+
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Body() updateShipmentStatusDto: UpdateShipmentStatusDto,
+  ): ShipmentDetailResponseDto {
+    const shipment = this.shipmentsService.updateStatus(
+      id,
+      updateShipmentStatusDto.status,
+    );
     return this.toDetailResponse(shipment);
   }
 
